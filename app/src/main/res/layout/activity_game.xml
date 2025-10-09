@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/infinity_castle_dark"
     android:padding="16dp"
     tools:context=".GameActivity">
@@ -15,10 +16,20 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/buttonQuit"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_quit"
+            android:contentDescription="Quit Game"
+            app:tint="@color/white"/>
+
         <TextView
             android:id="@+id/textViewTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="Time: 00:00"
             android:textColor="@color/white"
             android:textSize="20sp" />
@@ -28,11 +39,21 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:max="100"
             android:progress="0"
             android:progressTint="@color/progress_bar_color"/>
+
+        <ImageButton
+            android:id="@+id/buttonPause"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_pause"
+            android:contentDescription="Pause Game"
+            app:tint="@color/white"/>
 
     </LinearLayout>
 
@@ -45,7 +66,6 @@
         android:layout_marginTop="16dp"
         android:alignmentMode="alignMargins"
         android:columnCount="4"
-        android:useDefaultMargins="true">
-    </GridLayout>
+        android:useDefaultMargins="true"/>
 
 </RelativeLayout>

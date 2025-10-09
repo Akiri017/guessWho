@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/textViewTitle"
         android:layout_centerHorizontal="true"
-        android:text="Demon Slayer: Infinity Castle"
+        android:text="Demon Slayer Infinity Castle Version"
         android:textColor="@color/white"
         android:textSize="18sp" />
 
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:backgroundTint="@color/infinity_castle_accent"
-            android:text="Easy (4 Pairs)"
+            android:text="Easy"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -50,7 +50,7 @@
             android:layout_height="60dp"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/infinity_castle_accent"
-            android:text="Medium (6 Pairs)"
+            android:text="Medium"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -60,7 +60,7 @@
             android:layout_height="60dp"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/infinity_castle_accent"
-            android:text="Hard (8 Pairs)"
+            android:text="Hard"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
