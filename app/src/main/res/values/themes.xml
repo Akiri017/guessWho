@@ -1,0 +1,14 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.Santos_GuessWho_MP1" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/infinity_castle_glow</item>
+        <item name="colorPrimaryVariant">@color/infinity_castle_accent</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/infinity_castle_accent</item>
+        <item name="colorSecondaryVariant">@color/infinity_castle_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:windowBackground">@color/infinity_castle_dark</item>
+    </style>
+
+    <style name="Theme.Santos_GuessWho_MP1" parent="Base.Theme.Santos_GuessWho_MP1" />
+</resources>
