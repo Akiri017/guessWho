@@ -24,7 +24,6 @@ import java.util.Locale;
 
 public class GameActivity extends AppCompatActivity {
 
-    // (All your existing variables are here and correct)
     private int pairCount;
     private GridLayout gridLayout;
     private ArrayList<Integer> cardImages = new ArrayList<>();
@@ -51,7 +50,6 @@ public class GameActivity extends AppCompatActivity {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,9 +62,23 @@ public class GameActivity extends AppCompatActivity {
         buttonPause = findViewById(R.id.buttonPause);
         buttonQuit = findViewById(R.id.buttonQuit);
 
-        if (pairCount == 6) gridLayout.setColumnCount(4);
-        else if (pairCount == 8) gridLayout.setColumnCount(4);
-        else gridLayout.setColumnCount(4);
+        androidx.constraintlayout.widget.ConstraintLayout.LayoutParams params =
+                (androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) gridLayout.getLayoutParams();
+
+        if (pairCount == 4) {
+            params.matchConstraintPercentWidth = 0.9f;
+            gridLayout.setColumnCount(2);
+            gridLayout.setRowCount(4);
+        } else if (pairCount == 6) {
+            params.matchConstraintPercentWidth = 0.98f;
+            gridLayout.setColumnCount(3);
+            gridLayout.setRowCount(4);
+        } else {
+            params.matchConstraintPercentWidth = 1.0f;
+            gridLayout.setColumnCount(3);
+            gridLayout.setRowCount(6);
+        }
+        gridLayout.setLayoutParams(params);
 
         buttonPause.setOnClickListener(v -> {
             if (isPaused) resumeGame();
@@ -85,23 +97,28 @@ public class GameActivity extends AppCompatActivity {
         progressBar.setProgress(0);
         gridLayout.removeAllViews();
 
-        // This loop has the critical changes
         for (int i = 0; i < pairCount * 2; i++) {
-            // Inflate our custom SquareImageView
             SquareImageView card = (SquareImageView) LayoutInflater.from(this)
                     .inflate(R.layout.card_layout, gridLayout, false);
 
             card.setImageResource(R.drawable.card_back);
             card.setTag(cardImages.get(i));
+            GridLayout.LayoutParams params;
 
-            // Set up the Layout Parameters
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = 0; // This allows the columnSpec weight to work
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT; // This forces the grid to respect our onMeasure method
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f); // Distribute width evenly
-            // We DO NOT set a rowSpec weight, letting the height be natural.
+            if (pairCount == 8 && i == (pairCount * 2) - 1) {
+                params = new GridLayout.LayoutParams();
+                params.width = 0;
+                params.height = 0;
+                params.columnSpec = GridLayout.spec(1, 1f);
+                params.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            } else {
+                params = new GridLayout.LayoutParams();
+                params.width = 0;
+                params.height = 0;
+                params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+                params.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            }
             card.setLayoutParams(params);
-
 
             card.setOnClickListener(view -> {
                 if (!isChecking && firstCard != view && (firstCard == null || secondCard == null)) {
@@ -114,7 +131,6 @@ public class GameActivity extends AppCompatActivity {
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
-    // --- PAUSE, RESUME, AND QUIT METHODS ---
 
     private void pauseGame() {
         if (!isPaused) {
@@ -143,7 +159,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void showQuitDialog() {
         boolean wasRunning = !isPaused;
-        pauseGame(); // Pause regardless
+        pauseGame();
 
         new AlertDialog.Builder(this)
                 .setTitle("Quit Game?")
@@ -151,7 +167,7 @@ public class GameActivity extends AppCompatActivity {
                 .setPositiveButton("Quit", (dialog, which) -> finish())
                 .setNegativeButton("Cancel", (dialog, which) -> {
                     if (wasRunning) {
-                        resumeGame(); // Only resume if it was running before
+                        resumeGame();
                     }
                     dialog.dismiss();
                 })
@@ -160,7 +176,6 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-    // --- LIFECYCLE AND GAME LOGIC METHODS (Mostly unchanged) ---
     @Override
     protected void onPause() {
         super.onPause();
@@ -170,10 +185,8 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Do not auto-resume here. The user must press the resume button.
     }
 
-    // (The rest of your methods like prepareCardImages, flipCard, checkForMatch, etc., are unchanged and correct)
     private void prepareCardImages() {
         cardImages.clear();
         for (int i = 1; i <= pairCount; i++) {

@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // This method starts the GameActivity with the selected level
     private void startGame(int pairCount) {
         Intent intent = new Intent(MainActivity.this, GameActivity.class);
         intent.putExtra("PAIR_COUNT", pairCount);

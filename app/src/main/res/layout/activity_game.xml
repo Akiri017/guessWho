@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/infinity_castle_dark"
     android:padding="16dp"
     tools:context=".GameActivity">
@@ -15,16 +15,14 @@
         android:layout_alignParentTop="true"
         android:gravity="center_vertical"
         android:orientation="horizontal">
-
         <ImageButton
             android:id="@+id/buttonQuit"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_quit"
             android:contentDescription="Quit Game"
-            app:tint="@color/white"/>
-
+            android:src="@drawable/ic_quit"
+            app:tint="@color/white" />
         <TextView
             android:id="@+id/textViewTimer"
             android:layout_width="wrap_content"
@@ -33,7 +31,6 @@
             android:text="Time: 00:00"
             android:textColor="@color/white"
             android:textSize="20sp" />
-
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
@@ -44,28 +41,34 @@
             android:layout_weight="1"
             android:max="100"
             android:progress="0"
-            android:progressTint="@color/progress_bar_color"/>
-
+            android:progressTint="@color/progress_bar_color" />
         <ImageButton
             android:id="@+id/buttonPause"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_pause"
             android:contentDescription="Pause Game"
-            app:tint="@color/white"/>
-
+            android:src="@drawable/ic_pause"
+            app:tint="@color/white" />
     </LinearLayout>
 
-    <GridLayout
-        android:id="@+id/gridLayoutCards"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/topBar"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="16dp"
-        android:alignmentMode="alignMargins"
-        android:columnCount="4"
-        android:useDefaultMargins="true"/>
+        android:layout_alignParentBottom="true">
+
+        <GridLayout
+            android:id="@+id/gridLayoutCards"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:alignmentMode="alignMargins"
+            android:useDefaultMargins="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>
