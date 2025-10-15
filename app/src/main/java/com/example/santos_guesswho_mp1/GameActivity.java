@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -31,24 +33,15 @@ public class GameActivity extends AppCompatActivity {
     private ImageView secondCard = null;
     private int matchedPairs = 0;
     private boolean isChecking = false;
+    private CountDownTimer countDownTimer;
+    private long timeLeftInMillis;
+
     private TextView timerTextView;
-    private long startTime = 0;
-    private Handler timerHandler = new Handler();
-    private boolean isPaused = false;
     private ProgressBar progressBar;
     private ImageButton buttonPause;
     private ImageButton buttonQuit;
-    private Runnable timerRunnable = new Runnable() {
-        @Override
-        public void run() {
-            long millis = System.currentTimeMillis() - startTime;
-            int seconds = (int) (millis / 1000);
-            int minutes = seconds / 60;
-            seconds = seconds % 60;
-            timerTextView.setText(String.format(Locale.getDefault(), "Time: %02d:%02d", minutes, seconds));
-            timerHandler.postDelayed(this, 500);
-        }
-    };
+    private boolean isPaused = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +57,6 @@ public class GameActivity extends AppCompatActivity {
 
         androidx.constraintlayout.widget.ConstraintLayout.LayoutParams params =
                 (androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) gridLayout.getLayoutParams();
-
         if (pairCount == 4) {
             params.matchConstraintPercentWidth = 0.9f;
             gridLayout.setColumnCount(2);
@@ -90,6 +82,10 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setupGame() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        isChecking = false;
         prepareCardImages();
         Collections.shuffle(cardImages);
         matchedPairs = 0;
@@ -100,11 +96,9 @@ public class GameActivity extends AppCompatActivity {
         for (int i = 0; i < pairCount * 2; i++) {
             SquareImageView card = (SquareImageView) LayoutInflater.from(this)
                     .inflate(R.layout.card_layout, gridLayout, false);
-
             card.setImageResource(R.drawable.card_back);
             card.setTag(cardImages.get(i));
             GridLayout.LayoutParams params;
-
             if (pairCount == 8 && i == (pairCount * 2) - 1) {
                 params = new GridLayout.LayoutParams();
                 params.width = 0;
@@ -119,7 +113,6 @@ public class GameActivity extends AppCompatActivity {
                 params.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
             }
             card.setLayoutParams(params);
-
             card.setOnClickListener(view -> {
                 if (!isChecking && firstCard != view && (firstCard == null || secondCard == null)) {
                     flipCard((ImageView) view);
@@ -127,24 +120,57 @@ public class GameActivity extends AppCompatActivity {
             });
             gridLayout.addView(card);
         }
-        startTime = System.currentTimeMillis();
-        timerHandler.postDelayed(timerRunnable, 0);
+
+        long timeLimit;
+        if (pairCount == 4) timeLimit = 30000; // 30 seconds
+        else if (pairCount == 6) timeLimit = 60000; // 60 seconds
+        else timeLimit = 90000; // 90 seconds
+        timeLeftInMillis = timeLimit;
+        startTimer();
     }
 
+    private void startTimer() {
+        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
+                String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d",
+                        TimeUnit.MILLISECONDS.toMinutes(timeLeftInMillis) % 60,
+                        TimeUnit.MILLISECONDS.toSeconds(timeLeftInMillis) % 60);
+                timerTextView.setText("Time: " + timeFormatted);
+            }
+
+            @Override
+            public void onFinish() {
+                isChecking = true;
+                showLoseDialog();
+            }
+        }.start();
+        isPaused = false;
+        buttonPause.setImageResource(R.drawable.ic_pause);
+    }
+
+    private void showLoseDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Time's Up!")
+                .setMessage("You ran out of time.")
+                .setPositiveButton("Try Again", (dialog, which) -> setupGame()) // Restart the level
+                .setNegativeButton("Quit", (dialog, which) -> finish()) // Go to main menu
+                .setCancelable(false)
+                .show();
+    }
 
     private void pauseGame() {
         if (!isPaused) {
             isPaused = true;
-            timerHandler.removeCallbacks(timerRunnable);
+            countDownTimer.cancel(); // Stop the timer
             buttonPause.setImageResource(R.drawable.ic_play_arrow);
         }
     }
 
     private void resumeGame() {
         if (isPaused) {
-            isPaused = false;
-            timerHandler.postDelayed(timerRunnable, 0);
-            buttonPause.setImageResource(R.drawable.ic_pause);
+            startTimer();
         }
     }
 
@@ -159,7 +185,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void showQuitDialog() {
         boolean wasRunning = !isPaused;
-        pauseGame();
+        pauseGame(); // Pause the game first
 
         new AlertDialog.Builder(this)
                 .setTitle("Quit Game?")
@@ -175,16 +201,25 @@ public class GameActivity extends AppCompatActivity {
                 .show();
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
-        pauseGame();
+        if (countDownTimer != null) {
+            pauseGame();
+        }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private void winGame() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("You Win!")
+                .setMessage("Congratulations! You found all the pairs.")
+                .setPositiveButton("Play Again", (dialog, which) -> setupGame())
+                .setNegativeButton("Quit", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
     }
 
     private void prepareCardImages() {
@@ -222,11 +257,11 @@ public class GameActivity extends AppCompatActivity {
         if (firstCard.getTag().equals(secondCard.getTag())) {
             matchedPairs++;
             updateProgressBar();
-            firstCard.setOnClickListener(null);
-            secondCard.setOnClickListener(null);
             if (matchedPairs == pairCount) {
                 winGame();
             }
+            firstCard.setOnClickListener(null);
+            secondCard.setOnClickListener(null);
             resetTurn();
         } else {
             new Handler().postDelayed(() -> {
@@ -260,15 +295,5 @@ public class GameActivity extends AppCompatActivity {
     }
     private void updateProgressBar() {
         progressBar.setProgress(matchedPairs);
-    }
-    private void winGame() {
-        timerHandler.removeCallbacks(timerRunnable);
-        String finalTime = timerTextView.getText().toString();
-        new AlertDialog.Builder(this)
-                .setTitle("You Win!")
-                .setMessage("Congratulations! You found all the pairs.\n" + finalTime)
-                .setPositiveButton("Play Again", (dialog, which) -> finish())
-                .setCancelable(false)
-                .show();
     }
 }
